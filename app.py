@@ -69,6 +69,8 @@ def save_data(df):
 # --- 5. 세션 상태 초기화 ---
 if "quiz_idx" not in st.session_state: st.session_state.quiz_idx = None
 if "ai_feedback" not in st.session_state: st.session_state.ai_feedback = None
+if "last_subject" not in st.session_state:
+    st.session_state.last_subject = "전체"
 
 # --- 6. 사이드바 및 필터링 (핵심 추가 부분!) ---
 with st.sidebar:
@@ -84,6 +86,19 @@ with st.sidebar:
         subject_list = ["전체"] + sorted(raw_df['분야'].unique().tolist())
         selected_subject = st.selectbox("🎯 학습 분야 선택", subject_list)
         
+        if st.session_state.last_subject != selected_subject:
+            # 1. 입력창 비우기
+                st.session_state.ans_area = ""
+            # 2. 퀴즈 인덱스 초기화 (이전 분야의 번호가 남지 않도록)
+                st.session_state.quiz_idx = None
+            # 3. AI 피드백 초기화
+                st.session_state.ai_feedback = None
+            # 4. 현재 분야를 기록 (다음 비교를 위해)
+                st.session_state.last_subject = selected_subject
+            # 5. 깔끔하게 새로고침
+                st.rerun()
+
+
         # 선택한 분야만 필터링해서 df에 담기
         if selected_subject != "전체":
             df = raw_df[raw_df['분야'] == selected_subject]
