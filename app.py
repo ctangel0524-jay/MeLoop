@@ -106,13 +106,20 @@ st.header("🧠 오늘의 복습 챌린지")
 if not df.empty:
     due_df = df[df['NextReview'] <= datetime.now()]
     if st.button("🚀 복습 시작"):
+        # 1. 문제 선정 로직
         if not due_df.empty:
             st.session_state.quiz_idx = due_df.sample(n=1).index[0]
         else:
             st.session_state.quiz_idx = df.sample(n=1).index[0]
             st.info("현재 복습 대상이 없습니다. 전체 중 랜덤 모드로 진행합니다.")
-        st.session_state.ai_feedback = None
-        st.rerun()
+    
+    # 2. [핵심 추가] 기존 답변 입력창(ans_area) 초기화
+    # st.text_area의 key로 설정한 이름을 직접 빈 문자로 만들어줍니다.
+    st.session_state["ans_area"] = "" 
+    
+    # 3. 피드백 초기화 및 재실행
+    st.session_state.ai_feedback = None
+    st.rerun()
 
     if st.session_state.quiz_idx is not None:
         # 인덱스가 필터링된 데이터에 존재하는지 확인
